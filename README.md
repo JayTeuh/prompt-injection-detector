@@ -66,16 +66,16 @@ print(result)
 
 ## Results (Phase 2)
 
-I tested the detector against the deepset/prompt-injections benchmark. The test set has 116 prompts, 60 injections and 56 benign.
+I tested the detector against the deepset/prompt-injections benchmark, which has a set of 116 prompts, 60 injections and 56 benign. The detector scored the following results:
 
 - Precision: 100%
 - Recall: 1.67%
 - F1: 3.28%
 - Accuracy: 49.14%
 
-The detector almost never fires. It caught 1 of 60 attacks and never flagged a benign prompt. Digging in, only 4 of the 60 attacks matched any rule at all, so the weights were never the real problem. The patterns just don't cover how real attacks are phrased.
+The detector almost never fires, As it caught 1 of 60 attacks and never flagged a benign prompt. Only 4 of the 60 attacks matched any rule at all, so the weights were never truly the real problem. The patterns just don't cover how real attacks are phrased by real users.
 
-This is the known limit of rule-based detection. You can't write a regex for every synonym or every attack that uses no obvious keyword. That result is the reason to bring in machine learning for Phase 3.
+This is a known limit of rule-based detection since you can't write a regex for every synonym or every attack that uses no obvious keyword. That result is the reason to bring in machine learning for Phase 3 of the project.
 
 ## Status
 
