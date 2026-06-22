@@ -20,6 +20,11 @@ The detector has three steps:
 - role_play_override (0.7) - Asks the AI to act like something else
 - system_prompt_extraction (0.75) - Asks to see the system prompt
 - instruction_markers (0.65) - Uses fake labels like [SYSTEM] to look official
+- jailbreak_phrases (0.85) - Tries to disable safety or bypass filters
+- direct_commands (0.6) - Commands the AI to follow injected instructions
+- authority_claims (0.6) - Pretends to have admin or developer access
+- context_injection (0.65) - Tries to rewrite the conversation context
+- obfuscation_markers (0.6) - Uses separator lines to hide injected instructions
 
 ## Quick Start
 
