@@ -46,6 +46,12 @@ Low tier:
 - politeness_manipulation (0.25) - Softening language to lower the AI's guard
 - urgency_markers (0.25) - Pressure tactics like "urgent" or "immediately"
 
+## Setup
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
 ## Quick Start
 
 ```python
