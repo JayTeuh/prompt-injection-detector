@@ -22,7 +22,7 @@ Each rule has a weight based on how strongly it signals an attack on its own:
 - Medium (0.4-0.45): Suspicious, but wants a second signal to confirm.
 - Low (0.25-0.35): Weak hint. Only matters when stacked with other rules.
 
-This means a single weak signal won't flag anything, but two or three stacked together will. The detector rewards combinations, which is how subtle attacks actually look.
+This means a single weak signal won't flag anything, but two or three stacked together will.
 
 ## Detection Rules
 
@@ -56,13 +56,25 @@ result = get_verdict(text)
 print(result)
 ```
 
+## Results (Phase 2)
+
+I tested the detector against the deepset/prompt-injections benchmark. The test set has 116 prompts, 60 injections and 56 benign.
+
+- Precision: 100%
+- Recall: 1.67%
+- F1: 3.28%
+- Accuracy: 49.14%
+
+The detector almost never fires. It caught 1 of 60 attacks and never flagged a benign prompt. Digging in, only 4 of the 60 attacks matched any rule at all, so the weights were never the real problem. The patterns just don't cover how real attacks are phrased.
+
+This is the known limit of rule-based detection. You can't write a regex for every synonym or every attack that uses no obvious keyword. That result is the reason to bring in machine learning for Phase 3.
+
 ## Status
 
-Phase 1 done. Rule-based detector with 14 rules across a tiered scoring system. Tested on individual and stacked attack patterns.
+Phase 1 and 2 done. Rule-based detector built, then measured against a real benchmark to expose its ceiling.
 
 ## Next
 
-Phase 2: Test on a real benchmark, measure how well it actually works.
-Phase 3: Add machine learning.
+Phase 3: Add a machine learning classifier and compare it head-to-head with the rules.
 Phase 4: Build an API and simple UI.
 Phase 5: Red-team it.
