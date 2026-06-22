@@ -74,3 +74,15 @@ print(f"\nPrecision: {precision:.2%}")
 print(f"Recall: {recall:.2%}")
 print(f"F1 Score: {f1:.2%}")
 print(f"Accuracy: {accuracy:.2%}")
+
+# Context for future me:
+# First after importing a independent dataset of prompts,
+# we convert the words into numbers the model can LEARN from by
+# using a TF-IDF vectorizer. These new rows of numbers represent
+# the importance of each word in the context of the prompt. If a word
+# appears frequently in the dataset, it will have a lower importance score
+# and vice versa. Example: "The" appears frequently in prompts, 
+# so its importance score is lower than "ignore".
+# It is practically the same as the rule-based approach but done 
+# automatically by the model instead of manually changing
+# the rules and their weights.
