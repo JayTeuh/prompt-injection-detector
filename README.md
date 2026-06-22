@@ -64,25 +64,30 @@ result = get_verdict(text)
 print(result)
 ```
 
-## Results (Phase 2)
+## Results
 
-I tested the detector against the deepset/prompt-injections benchmark, which has a set of 116 prompts, 60 injections and 56 benign. The detector scored the following results:
+I tested both approaches against the same deepset/prompt-injections benchmark. The test set has 116 prompts, 60 injections and 56 benign.
 
-- Precision: 100%
-- Recall: 1.67%
-- F1: 3.28%
-- Accuracy: 49.14%
+| Metric | Rules (Phase 1-2) | ML (Phase 3) |
+|---|---|---|
+| Precision | 100% | 100% |
+| Recall | 1.67% | 60.00% |
+| F1 | 3.28% | 75.00% |
+| Accuracy | 49.14% | 79.31% |
 
-The detector almost never fires, As it caught 1 of 60 attacks and never flagged a benign prompt. Only 4 of the 60 attacks matched any rule at all, so the weights were never truly the real problem. The patterns just don't cover how real attacks are phrased by real users.
+The rule-based detector almost never fired. It caught 1 of 60 attacks and only 4 of the 60 attacks matched any rule at all, so the weights were never the real problem. The patterns just don't cover how real attacks are phrased.
 
-This is a known limit of rule-based detection since you can't write a regex for every synonym or every attack that uses no obvious keyword. That result is the reason to bring in machine learning for Phase 3 of the project.
+The ML classifier (TF-IDF + logistic regression) caught 36 of 60 attacks with no false positives, a 36x jump in recall, learning from 546 training examples instead of hand-written rules.
+
+A note on the numbers: precision shows 100% because the model happened to get all 56 benign test prompts right. On a larger, messier benign set it would likely dip. And recall caps at 60% because TF-IDF only knows words it saw in training, so novel phrasing still slips through. That is the motivation for a transformer-based approach later.
+
+This is the core lesson of the project. Rules are transparent and fast but hit a hard ceiling. Learned models generalize past the exact phrases you thought of.
 
 ## Status
 
-Phase 1 and 2 done. Rule-based detector built, then measured against a real benchmark to expose its ceiling.
+Phases 1 through 3 done. Built a rule-based detector, measured its ceiling on a real benchmark, then trained an ML classifier that beat it on the same data.
 
 ## Next
 
-Phase 3: Add a machine learning classifier and compare it head-to-head with the rules.
 Phase 4: Build an API and simple UI.
 Phase 5: Red-team it.
