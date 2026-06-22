@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python patterns.py)",
-      "Bash(python detector.py)",
-      "Bash(python3 /Users/jtriddle/Desktop/my-project/detector.py)"
-    ]
-  }
-}
