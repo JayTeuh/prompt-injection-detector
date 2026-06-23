@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Prompt Injection Detector</title>
+    </head>
+    <body>
+        <h1>Prompt Injection Detector</h1>
+        <p>Paste text below to check if it contains a prompt injection.</p>
+
+        <textarea
+            id="input-text"
+            rows="6"
+            cols="60"
+            placeholder="Type or paste text here..."
+        ></textarea>
+        <br />
+        <button onclick="analyze()">Analyze</button>
+
+        <div id="results"></div>
+
+        <script>
+            async function analyze() {
+                const text = document.getElementById("input-text").value;
+                const res = await fetch("/analyze", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text }),
+                });
+                const data = await res.json();
+
+                let html = "<h2>Results</h2>";
+
+                html += "<h3>Rule-Based Detector</h3>";
+                html +=
+                    "<p>Verdict: " +
+                    (data.rule_based.is_injection ? "INJECTION" : "BENIGN") +
+                    "</p>";
+                html += "<p>Confidence: " + data.rule_based.confidence + "</p>";
+                if (data.rule_based.rules_fired.length > 0) {
+                    html += "<p>Rules fired:</p><ul>";
+                    data.rule_based.rules_fired.forEach((r) => {
+                        html +=
+                            "<li>" +
+                            r.name +
+                            " (" +
+                            r.weight +
+                            ") - " +
+                            r.category +
+                            "</li>";
+                    });
+                    html += "</ul>";
+                }
+
+                html += "<h3>ML Classifier</h3>";
+                html +=
+                    "<p>Verdict: " +
+                    (data.ml_classifier.is_injection ? "INJECTION" : "BENIGN") +
+                    "</p>";
+                html +=
+                    "<p>Confidence (injection): " +
+                    (data.ml_classifier.confidence_injection * 100).toFixed(1) +
+                    "%</p>";
+
+                document.getElementById("results").innerHTML = html;
+            }
+        </script>
+    </body>
+</html>
