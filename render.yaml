@@ -1,9 +1,10 @@
 services:
     - type: web
-      name: prompt-injection-detector
+      name: flightwatch
       runtime: python
-      buildCommand: pip install -r requirements.txt
+      pythonVersion: 3.11
+      buildCommand: bash build.sh
       startCommand: gunicorn app:app
       envVars:
           - key: PYTHON_VERSION
-            value: "3.11"
+            value: 3.11
