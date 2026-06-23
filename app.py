@@ -3,12 +3,16 @@ app.py — Flask API for the prompt injection detector.
 Runs both rule-based and ML detection on submitted text.
 """
 
+import joblib
 from flask import Flask, jsonify, render_template, request
 
 from detector import get_verdict
-from ml_classifier import model, vectorizer
 
 app = Flask(__name__)
+
+# Load the pre-trained ML model from disk (instant, no retraining)
+vectorizer = joblib.load("vectorizer.joblib")
+model = joblib.load("model.joblib")
 
 
 @app.route("/analyze", methods=["POST"])
@@ -53,4 +57,4 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5001)
