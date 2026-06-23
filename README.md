@@ -1,6 +1,8 @@
 # Prompt Injection Detector
 
-A rule-based detector for identifying prompt injection attacks on language models.
+A rule-based detector and ML classifier for identifying prompt injection attacks on language models.
+
+**Live demo:** https://prompt-injection-detector-qf38.onrender.com
 
 ## What is Prompt Injection?
 
@@ -8,13 +10,13 @@ Prompt injection is when someone slips instructions into text an AI reads, and t
 
 ## How It Works
 
-The detector has three steps:
+The detector runs two approaches side by side:
 
-1. Normalize the text. Lowercase everything, remove extra spaces, clean up Unicode so attackers can't use fancy tricks to bypass it.
-2. Check it against 14 regex patterns that catch common attack types.
-3. Add up the weights from rules that matched. If the total is 0.5 or higher, it's flagged as an injection.
+**Rule-based:** Normalize the text, check it against 14 regex patterns that catch common attack types, add up the weights from rules that matched. If the total is 0.5 or higher, it's flagged as an injection.
 
-## Scoring
+**ML classifier:** Convert the text into TF-IDF numbers (each word gets a score based on how distinctive it is), then a logistic regression model predicts whether it's an attack based on patterns it learned from 546 labeled training examples.
+
+## Scoring (Rule-Based)
 
 Each rule has a weight based on how strongly it signals an attack on its own:
 
@@ -64,6 +66,14 @@ result = get_verdict(text)
 print(result)
 ```
 
+To run the web UI locally:
+
+```
+python3 app.py
+```
+
+Then open http://localhost:5001 in your browser.
+
 ## Results
 
 I tested both approaches against the same deepset/prompt-injections benchmark. The test set has 116 prompts, 60 injections and 56 benign.
@@ -79,15 +89,14 @@ The rule-based detector almost never fired. It caught 1 of 60 attacks and only 4
 
 The ML classifier (TF-IDF + logistic regression) caught 36 of 60 attacks with no false positives, a 36x jump in recall, learning from 546 training examples instead of hand-written rules.
 
-A note on the numbers: precision shows 100% because the model happened to get all 56 benign test prompts right. On a larger, messier benign set it would likely dip. And recall caps at 60% because TF-IDF only knows words it saw in training, so novel phrasing still slips through. That is the motivation for a transformer-based approach later.
+A note on the numbers: precision shows 100% because the model happened to get all 56 benign test prompts right. On a larger, messier benign set it would likely dip. And recall caps at 60% because TF-IDF only knows words it saw in training, so novel phrasing still slips through.
 
 This is the core lesson of the project. Rules are transparent and fast but hit a hard ceiling. Learned models generalize past the exact phrases you thought of.
 
 ## Status
 
-Phases 1 through 3 done. Built a rule-based detector, measured its ceiling on a real benchmark, then trained an ML classifier that beat it on the same data.
+Phases 1 through 4 done. Built a rule-based detector, measured its ceiling on a real benchmark, trained an ML classifier that beat it on the same data, and deployed a web UI.
 
 ## Next
 
-Phase 4: Build an API and simple UI.
 Phase 5: Red-team it.
