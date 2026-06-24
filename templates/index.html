@@ -4,66 +4,373 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Prompt Injection Detector</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --cream: #fcf6ea;
+                --card: #fffdf8;
+                --ink: #2c241b;
+                --muted: #897e6e;
+                --line: #ece2d0;
+                --orange: #e8590c;
+                --orange-soft: #fbe6d4;
+                --green: #2f7a4d;
+                --green-soft: #e3f1e7;
+                --red: #c0392b;
+                --red-soft: #f7e1dd;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                background: var(--cream);
+                color: var(--ink);
+                font-family: "Inter", system-ui, sans-serif;
+                line-height: 1.5;
+                padding: 48px 20px 80px;
+                text-align: center;
+            }
+
+            .wrap {
+                width: 100%;
+                max-width: 620px;
+            }
+
+            h1 {
+                font-family: "Fraunces", Georgia, serif;
+                font-weight: 600;
+                font-size: 2.5rem;
+                letter-spacing: -0.01em;
+                margin: 0 0 10px;
+            }
+
+            .subtitle {
+                color: var(--muted);
+                margin: 0 0 32px;
+                font-size: 1.02rem;
+            }
+
+            textarea {
+                width: 100%;
+                min-height: 160px;
+                resize: vertical;
+                padding: 16px 18px;
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                background: var(--card);
+                color: var(--ink);
+                font-family: inherit;
+                font-size: 1rem;
+                line-height: 1.5;
+                outline: none;
+                transition:
+                    border-color 0.15s,
+                    box-shadow 0.15s;
+            }
+
+            textarea::placeholder {
+                color: #b6ab99;
+            }
+
+            textarea:focus {
+                border-color: var(--orange);
+                box-shadow: 0 0 0 3px var(--orange-soft);
+            }
+
+            button {
+                margin-top: 18px;
+                padding: 13px 36px;
+                border: none;
+                border-radius: 999px;
+                background: var(--orange);
+                color: #fff;
+                font-family: inherit;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition:
+                    transform 0.1s,
+                    background 0.15s,
+                    opacity 0.15s;
+            }
+
+            button:hover:not(:disabled) {
+                background: #d24e08;
+            }
+
+            button:active:not(:disabled) {
+                transform: translateY(1px);
+            }
+
+            button:disabled {
+                opacity: 0.6;
+                cursor: default;
+            }
+
+            #results {
+                margin-top: 36px;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .card {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 22px 24px;
+                text-align: left;
+            }
+
+            .card-title {
+                font-family: "Fraunces", Georgia, serif;
+                font-weight: 600;
+                font-size: 1.15rem;
+                margin: 0 0 14px;
+            }
+
+            .row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin: 8px 0;
+            }
+
+            .row .label {
+                color: var(--muted);
+                font-size: 0.92rem;
+            }
+
+            .row .value {
+                font-weight: 600;
+                font-variant-numeric: tabular-nums;
+            }
+
+            .badge {
+                display: inline-block;
+                padding: 5px 14px;
+                border-radius: 999px;
+                font-size: 0.82rem;
+                font-weight: 600;
+                letter-spacing: 0.02em;
+            }
+
+            .badge.injection {
+                background: var(--red-soft);
+                color: var(--red);
+            }
+
+            .badge.benign {
+                background: var(--green-soft);
+                color: var(--green);
+            }
+
+            .rules-title {
+                margin: 16px 0 8px;
+                font-size: 0.9rem;
+                color: var(--muted);
+            }
+
+            .rules {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .rules li {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 10px 14px;
+                background: var(--cream);
+                border-radius: 10px;
+                font-size: 0.9rem;
+            }
+
+            .rules .rule-name {
+                font-weight: 500;
+            }
+
+            .rules .rule-meta {
+                color: var(--muted);
+                font-size: 0.82rem;
+                white-space: nowrap;
+            }
+
+            .results-heading {
+                font-family: "Fraunces", Georgia, serif;
+                font-weight: 600;
+                font-size: 1.4rem;
+                margin: 0 0 4px;
+                text-align: center;
+            }
+
+            .empty {
+                color: var(--muted);
+                font-size: 0.9rem;
+                margin: 6px 0 0;
+            }
+
+            .divider {
+                width: 56px;
+                height: 2px;
+                border: none;
+                background: var(--orange);
+                border-radius: 999px;
+                margin: 0 auto 32px;
+                opacity: 0.85;
+            }
+
+            .footer {
+                margin-top: 48px;
+                font-size: 0.85rem;
+                color: var(--muted);
+            }
+
+            .footer a {
+                color: var(--orange);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+            .footer a:hover {
+                text-decoration: underline;
+            }
+        </style>
     </head>
     <body>
-        <h1>Prompt Injection Detector</h1>
-        <p>Paste text below to check if it contains a prompt injection.</p>
-
-        <textarea
-            id="input-text"
-            rows="6"
-            cols="60"
-            placeholder="Type or paste text here..."
-        ></textarea>
-        <br />
-        <button onclick="analyze()">Analyze</button>
-
-        <div id="results"></div>
+        <div class="wrap">
+            <h1>Prompt Injection Detector</h1>
+            <p class="subtitle">
+                Paste text below to check if it contains a prompt injection.
+            </p>
+            <hr class="divider" />
+            <textarea
+                id="input-text"
+                placeholder="Type or paste text here..."
+            ></textarea>
+            <br />
+            <button id="analyze-btn" onclick="analyze()">Analyze</button>
+            <div id="results"></div>
+            <p class="footer">
+                Made by James Riddle &middot;
+                <a
+                    href="https://github.com/JayTeuh"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    GitHub
+                </a>
+            </p>
+        </div>
 
         <script>
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+
+            function verdictBadge(isInjection) {
+                return isInjection
+                    ? '<span class="badge injection">INJECTION</span>'
+                    : '<span class="badge benign">BENIGN</span>';
+            }
+
             async function analyze() {
+                const btn = document.getElementById("analyze-btn");
+                const results = document.getElementById("results");
                 const text = document.getElementById("input-text").value;
-                const res = await fetch("/analyze", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: text }),
-                });
-                const data = await res.json();
 
-                let html = "<h2>Results</h2>";
+                btn.disabled = true;
+                btn.textContent = "Analyzing...";
+                results.innerHTML = "";
 
-                html += "<h3>Rule-Based Detector</h3>";
-                html +=
-                    "<p>Verdict: " +
-                    (data.rule_based.is_injection ? "INJECTION" : "BENIGN") +
-                    "</p>";
-                html += "<p>Confidence: " + data.rule_based.confidence + "</p>";
-                if (data.rule_based.rules_fired.length > 0) {
-                    html += "<p>Rules fired:</p><ul>";
-                    data.rule_based.rules_fired.forEach((r) => {
-                        html +=
-                            "<li>" +
-                            r.name +
-                            " (" +
-                            r.weight +
-                            ") - " +
-                            r.category +
-                            "</li>";
+                try {
+                    const res = await fetch("/analyze", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text: text }),
                     });
-                    html += "</ul>";
+                    const data = await res.json();
+
+                    let html = '<h2 class="results-heading">Results</h2>';
+
+                    // Rule-based detector
+                    html += '<div class="card">';
+                    html += '<p class="card-title">Rule-Based Detector</p>';
+                    html +=
+                        '<div class="row"><span class="label">Verdict</span>' +
+                        verdictBadge(data.rule_based.is_injection) +
+                        "</div>";
+                    html +=
+                        '<div class="row"><span class="label">Confidence</span>' +
+                        '<span class="value">' +
+                        escapeHtml(data.rule_based.confidence) +
+                        "</span></div>";
+
+                    if (data.rule_based.rules_fired.length > 0) {
+                        html += '<p class="rules-title">Rules fired</p>';
+                        html += '<ul class="rules">';
+                        data.rule_based.rules_fired.forEach((r) => {
+                            html +=
+                                '<li><span class="rule-name">' +
+                                escapeHtml(r.name) +
+                                '</span><span class="rule-meta">' +
+                                escapeHtml(r.category) +
+                                " &middot; " +
+                                escapeHtml(r.weight) +
+                                "</span></li>";
+                        });
+                        html += "</ul>";
+                    } else {
+                        html += '<p class="empty">No rules fired.</p>';
+                    }
+                    html += "</div>";
+
+                    // ML classifier
+                    html += '<div class="card">';
+                    html += '<p class="card-title">ML Classifier</p>';
+                    html +=
+                        '<div class="row"><span class="label">Verdict</span>' +
+                        verdictBadge(data.ml_classifier.is_injection) +
+                        "</div>";
+                    html +=
+                        '<div class="row"><span class="label">Confidence (injection)</span>' +
+                        '<span class="value">' +
+                        (data.ml_classifier.confidence_injection * 100).toFixed(
+                            1,
+                        ) +
+                        "%</span></div>";
+                    html += "</div>";
+
+                    results.innerHTML = html;
+                } catch (err) {
+                    results.innerHTML =
+                        '<div class="card"><p class="empty">Something went wrong reaching the analyzer. Try again.</p></div>';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "Analyze";
                 }
-
-                html += "<h3>ML Classifier</h3>";
-                html +=
-                    "<p>Verdict: " +
-                    (data.ml_classifier.is_injection ? "INJECTION" : "BENIGN") +
-                    "</p>";
-                html +=
-                    "<p>Confidence (injection): " +
-                    (data.ml_classifier.confidence_injection * 100).toFixed(1) +
-                    "%</p>";
-
-                document.getElementById("results").innerHTML = html;
             }
         </script>
     </body>
