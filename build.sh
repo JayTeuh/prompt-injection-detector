@@ -2,4 +2,4 @@
 set -e
 
 pip install --upgrade pip setuptools wheel
-pip install -r requirements.txt
+pip install --only-binary=:all: -r requirements.txt
